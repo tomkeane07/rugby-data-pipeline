@@ -21,10 +21,13 @@ Build a reproducible data pipeline that:
 
 ## Repository Structure
 
-- `flows/rugby_pipeline_daily.yml`: Kestra flow (4 tasks)
-- `scripts/`: ingestion, load, dbt execution, milestone utilities
-- `dbt/rugby_stats/`: dbt project with staging/intermediate/marts and tests
-- `docs/evidence/`: milestone evidence artifacts
+- `flows/rugby_pipeline_daily.yml`: Kestra flow (5 tasks: fetch teams, team stats, match details, load, dbt)
+- `scripts/`: ingestion, load, and dbt execution scripts
+- `dbt/rugby_stats/`: dbt project with staging/intermediate/marts models and tests
+- `infra/terraform/`: Terraform configuration for infrastructure setup
+- `docs/`: project objective and technical documentation
+- `docs/assets/screenshots/`: report page screenshots used in this README
+- `Copy_of_rugby-datatalks-report.pdf`: final submission report deliverable
 
 ## Prerequisites
 
@@ -88,7 +91,7 @@ docker run --rm \
   dbt build --project-dir dbt/rugby_stats --profiles-dir dbt/rugby_stats
 ```
 
-5. Generate dashboard query/checklist pack (Milestone 6 utility):
+5. (Optional) Generate dashboard query/checklist artifacts:
 
 ```bash
 docker run --rm \
@@ -101,18 +104,23 @@ docker run --rm \
   python scripts/milestone6_prepare_dashboard_evidence.py
 ```
 
-## Evidence Map
+## Deliverables
 
-- Milestone 1 (Terraform): `docs/evidence/milestone1/`
-- Milestone 2 (Kestra flow + debugging): `docs/evidence/milestone2/`
-- Milestone 4 (BigQuery load validation): `docs/evidence/milestone4/`
-- Milestone 5 (dbt build/test/docs): `docs/evidence/milestone5/`
-- Milestone 6 (Looker prep and checklist): `docs/evidence/milestone6/`
-- Milestone 7 (reproducibility checklist/transcript): `docs/evidence/milestone7/`
+- Final report PDF: `Copy_of_rugby-datatalks-report.pdf`
+- Report page screenshots:
+  - `docs/assets/screenshots/report-page-1.png`
+  - `docs/assets/screenshots/report-page-2.png`
+- Project objective: `docs/project_objective.md`
+- Pipeline design and implementation notes: `docs/rugby-stats-pipeline.md`
+- rugbypy source notes: `docs/rugbypy.md`
+
+### Report Preview
+
+![Report page 1](docs/assets/screenshots/report-page-1.png)
+
+![Report page 2](docs/assets/screenshots/report-page-2.png)
 
 ## Notes
 
-- Final successful orchestration run and fix history are summarized in `docs/evidence/milestone2/kestra_milestone2_rollup.md`.
-- Dashboard screenshot capture remains a manual step in Looker Studio.
-- New-project validation succeeded on `rugby-datatalks-pipeline` with a full successful rerun: `docs/evidence/milestone2/20260418T043007Z_new_project_full_rerun/rerun_summary.md`.
-- Refreshed BigQuery/dbt evidence for the new project is in `docs/evidence/milestone4/20260418T043653Z/` and `docs/evidence/milestone5/20260418T043652Z_new_project_refresh/`.
+- `notebooks/` is intentionally git-ignored for local exploration only.
+- Local raw extracts, secrets, dbt build outputs, and Terraform state are intentionally git-ignored.
