@@ -126,4 +126,5 @@ docker run --rm \
 - `notebooks/` is intentionally git-ignored for local exploration only.
 - Local raw extracts, secrets, dbt build outputs, and Terraform state are intentionally git-ignored.
 - Score-difference symmetry is protected by a custom dbt data test in `dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql`.
+- The `team_stats` BigQuery table is **partitioned by `game_date`** and **clustered by `team_id`**. Partitioning by date allows dashboard and dbt queries that filter on a season or date range to scan only the relevant partitions, reducing cost and latency. Clustering by `team_id` further optimises the most common access pattern: filtering or aggregating stats for a specific team.
 - Some score differences in the report screenshots and PDF may appear one-sided. This is a known source data limitation: certain teams are labelled as `"other"` in the upstream API, so their corresponding row is present in the warehouse but not attributed to a named team. The pipeline data and symmetry test are correct; the visual asymmetry reflects this naming gap in the source.
