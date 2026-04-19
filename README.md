@@ -110,6 +110,7 @@ docker run --rm \
 - Report page screenshots:
   - `docs/assets/screenshots/report-page-1.png`
   - `docs/assets/screenshots/report-page-2.png`
+- Score-difference issue discovery and remediation: `docs/score_difference_data_quality.md`
 - Project objective: `docs/project_objective.md`
 - Pipeline design and implementation notes: `docs/rugby-stats-pipeline.md`
 - rugbypy source notes: `docs/rugbypy.md`
@@ -124,3 +125,4 @@ docker run --rm \
 
 - `notebooks/` is intentionally git-ignored for local exploration only.
 - Local raw extracts, secrets, dbt build outputs, and Terraform state are intentionally git-ignored.
+- Score-difference symmetry is protected by a custom dbt data test in `dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql`.

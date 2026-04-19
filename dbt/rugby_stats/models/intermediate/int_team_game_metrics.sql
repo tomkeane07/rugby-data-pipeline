@@ -1,3 +1,16 @@
+with scored_team_games as (
+  select *
+  from {{ ref('stg_team_stats') }}
+  where score is not null
+    and opponent_score is not null
+),
+complete_matches as (
+  select
+    match_id
+  from scored_team_games
+  group by match_id
+  having count(distinct team_id) = 2
+)
 select
   s.team_game_key,
   s.team_id,
@@ -21,6 +34,8 @@ select
     when s.score < s.opponent_score then 'L'
     else 'D'
   end as winner_flag
-from {{ ref('stg_team_stats') }} s
+from scored_team_games s
+inner join complete_matches cm
+  on s.match_id = cm.match_id
 left join {{ ref('stg_match_details') }} d
   on s.match_id = d.match_id
