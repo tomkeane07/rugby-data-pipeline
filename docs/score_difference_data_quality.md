@@ -2,7 +2,7 @@
 
 ## Summary
 
-A data quality issue was identified in the score-difference time series: some matches appeared with only one team row (lopsided), while other matches correctly had both team rows.
+A data quality issue was identified in the score-difference time series: some matches had only one team row in source data, while other matches correctly had both team rows.
 
 Expected rule per match:
 
@@ -11,11 +11,7 @@ Expected rule per match:
 
 ## Discovery Evidence
 
-The issue was first observed in the dashboard output where some matches appeared as one-sided entries.
-
-![Lopsided score difference evidence page 1](docs/assets/screenshots/report-page-1.png)
-
-![Lopsided score difference evidence page 2](docs/assets/screenshots/report-page-2.png)
+The issue was identified during pipeline validation: some matches appeared with only one team row in source data rather than two.
 
 ## Verification
 
@@ -30,7 +26,7 @@ A schema-aware profile over local `data/raw/team_stats/*.parquet` confirmed:
 Interpretation:
 
 - The transformation logic for score difference was mathematically correct.
-- The lopsided behavior was caused by incomplete match coverage in source rows.
+- The one-sided match behavior was caused by incomplete match coverage in source rows.
 
 ## Root Cause
 
