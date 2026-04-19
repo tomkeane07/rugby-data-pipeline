@@ -111,7 +111,7 @@ docker run --rm \
   - `docs/assets/screenshots/report-page-1.png`
   - `docs/assets/screenshots/report-page-2.png`
 - Score-difference data quality remediation: `docs/score_difference_data_quality.md`
-- Project objective: `docs/project_objective.md`
+- Project objective: `docs/de_zoomcamp_project_spec.md`
 - Pipeline design and implementation notes: `docs/rugby-stats-pipeline.md`
 - rugbypy source notes: `docs/rugbypy.md`
 
