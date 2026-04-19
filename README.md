@@ -126,3 +126,4 @@ docker run --rm \
 - `notebooks/` is intentionally git-ignored for local exploration only.
 - Local raw extracts, secrets, dbt build outputs, and Terraform state are intentionally git-ignored.
 - Score-difference symmetry is protected by a custom dbt data test in `dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql`.
+- Some score differences in the report screenshots and PDF may appear one-sided. This is a known source data limitation: certain teams are labelled as `"other"` in the upstream API, so their corresponding row is present in the warehouse but not attributed to a named team. The pipeline data and symmetry test are correct; the visual asymmetry reflects this naming gap in the source.
