@@ -26,6 +26,12 @@ models:
 
   - name: vw_league_score_difference_timeseries
     columns:
+      - name: match_id
+        tests:
+          - not_null
+      - name: match_label
+        tests:
+          - not_null
       - name: game_date
         tests:
           - not_null
