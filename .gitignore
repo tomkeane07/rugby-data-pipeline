@@ -1,0 +1,37 @@
+.env
+secrets/*.json
+infra/terraform/.terraform/
+infra/terraform/terraform.tfstate
+infra/terraform/terraform.tfstate.*
+infra/terraform/terraform.tfvars
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+notebooks/.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# dbt generated artifacts
+dbt/rugby_stats/target/
+dbt/rugby_stats/logs/
+dbt/rugby_stats/dbt_packages/
+
+# Local generated pipeline data (raw extracts and run logs)
+data/raw/teams/*.parquet
+data/raw/team_stats/*.parquet
+data/raw/match_details/*.parquet
+data/raw/run_summaries/*.json
+
+# Local runtime/OS/editor noise
+.DS_Store
+.vscode/
+
+# Private local recovery artifacts
+docs/recovered_session1_chat.txt

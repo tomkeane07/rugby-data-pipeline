@@ -1,0 +1,63 @@
+version: 2
+
+models:
+  - name: dim_teams
+    columns:
+      - name: team_id
+        tests:
+          - not_null
+          - unique
+
+  - name: fct_team_performance
+    columns:
+      - name: team_game_key
+        tests:
+          - not_null
+          - unique
+      - name: team_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_teams')
+              field: team_id
+      - name: game_date
+        tests:
+          - not_null
+
+  - name: vw_league_score_difference_timeseries
+    columns:
+      - name: game_date
+        tests:
+          - not_null
+      - name: team_name
+        tests:
+          - not_null
+      - name: score_difference
+        tests:
+          - not_null
+      - name: league_name
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - European Rugby Challenge Cup
+                - European Rugby Champions Cup
+                - Major League Rugby
+                - Super Rugby Pacific
+
+  - name: vw_league_margin_categorical
+    columns:
+      - name: league_name
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - European Rugby Challenge Cup
+                - European Rugby Champions Cup
+                - Super Rugby Pacific
+      - name: matches
+        tests:
+          - not_null
+      - name: avg_match_margin
+        tests:
+          - not_null

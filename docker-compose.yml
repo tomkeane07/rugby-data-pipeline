@@ -1,0 +1,14 @@
+services:
+  python:
+    container_name: rugby_data_project
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /workspace
+    ports:
+      - "2000:2000"
+      - "8888:8888"
+    volumes:
+      - .:/workspace
+    env_file:
+      - .env

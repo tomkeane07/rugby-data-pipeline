@@ -1,0 +1,13 @@
+rugby_stats:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS', '/workspace/secrets/cloud_key.json') }}"
+      project: "{{ env_var('GCP_PROJECT_ID', 'rugby-datatalks-pipeline') }}"
+      dataset: "{{ env_var('BQ_DATASET_ANALYTICS', 'raw') }}"
+      location: "europe-west2"
+      priority: interactive
+      threads: 4
+      timeout_seconds: 300

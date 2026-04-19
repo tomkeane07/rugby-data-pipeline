@@ -1,0 +1,38 @@
+version: 2
+
+sources:
+  - name: raw
+    database: "{{ env_var('GCP_PROJECT_ID', 'rugby-datatalks-pipeline') }}"
+    schema: "{{ env_var('BQ_DATASET_RAW', 'raw') }}"
+    tables:
+      - name: teams
+      - name: team_stats
+      - name: match_details
+
+models:
+  - name: stg_teams
+    columns:
+      - name: team_id
+        tests:
+          - not_null
+          - unique
+
+  - name: stg_team_stats
+    columns:
+      - name: team_game_key
+        tests:
+          - not_null
+          - unique
+      - name: team_id
+        tests:
+          - not_null
+      - name: game_date
+        tests:
+          - not_null
+
+  - name: stg_match_details
+    columns:
+      - name: match_id
+        tests:
+          - not_null
+          - unique

@@ -1,0 +1,14 @@
+rugbypy
+jupyter
+pandas
+fastparquet
+sqlalchemy
+psycopg2-binary
+python-dotenv
+dlt[bigquery,gs,duckdb]
+google-cloud-storage
+dbt-core
+dbt-duckdb
+dbt-bigquery
+google-cloud-bigquery
+pyarrow

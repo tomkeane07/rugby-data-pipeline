@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: int_team_game_metrics
+    columns:
+      - name: team_game_key
+        tests:
+          - not_null
+      - name: winner_flag
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['W', 'L', 'D']

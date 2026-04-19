@@ -1,0 +1,6 @@
+project_id        = "your-gcp-project-id"
+region            = "europe-west2"
+bucket_name       = "rugby-data-lake-your-suffix"
+dataset_raw       = "raw"
+dataset_analytics = "analytics"
+environment       = "dev"

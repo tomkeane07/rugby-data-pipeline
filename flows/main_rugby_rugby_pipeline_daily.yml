@@ -1,0 +1,72 @@
+id: rugby_pipeline_daily
+namespace: rugby
+
+description: |
+  End-to-end rugby batch flow:
+  1) fetch_teams
+  2) fetch_team_stats
+  3) load_to_bigquery
+  4) run_dbt
+
+variables:
+  runtime_image: rugby_data_project-python
+  project_id: rugby-datatalks-pipeline
+  dataset_raw: raw
+
+tasks:
+  - id: fetch_teams
+    type: io.kestra.plugin.scripts.python.Commands
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+      volumes:
+        - /home/tomkeane/projects/rugby_data_project:/workspace
+    containerImage: "{{ vars.runtime_image }}"
+    commands:
+      - cd /workspace && python scripts/fetch_teams.py
+
+  - id: fetch_team_stats
+    type: io.kestra.plugin.scripts.python.Commands
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+      volumes:
+        - /home/tomkeane/projects/rugby_data_project:/workspace
+    containerImage: "{{ vars.runtime_image }}"
+    env:
+      INGEST_MAX_TEAMS: "0"
+    commands:
+      - cd /workspace && python scripts/fetch_team_stats.py
+
+  - id: load_to_bigquery
+    type: io.kestra.plugin.scripts.python.Commands
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+      volumes:
+        - /home/tomkeane/projects/rugby_data_project:/workspace
+    containerImage: "{{ vars.runtime_image }}"
+    env:
+      GOOGLE_APPLICATION_CREDENTIALS: /workspace/secrets/cloud_key.json
+      GCP_PROJECT_ID: "{{ vars.project_id }}"
+      BQ_DATASET_RAW: "{{ vars.dataset_raw }}"
+    commands:
+      - cd /workspace && python scripts/load_to_bigquery.py
+
+  - id: run_dbt
+    type: io.kestra.plugin.scripts.python.Commands
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+      volumes:
+        - /home/tomkeane/projects/rugby_data_project:/workspace
+    containerImage: "{{ vars.runtime_image }}"
+    env:
+      GOOGLE_APPLICATION_CREDENTIALS: /workspace/secrets/cloud_key.json
+      GCP_PROJECT_ID: "{{ vars.project_id }}"
+      BQ_DATASET_RAW: "{{ vars.dataset_raw }}"
+      BQ_DATASET_ANALYTICS: "{{ vars.dataset_raw }}"
+    commands:
+      - cd /workspace && python scripts/run_dbt.py
+
+triggers:
+  - id: daily
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 3 * * *"
+    timezone: "UTC"
