@@ -15,6 +15,9 @@ __pycache__/
 venv/
 notebooks/.venv/
 
+# Local notebooks (exploratory)
+notebooks/
+
 # Jupyter
 .ipynb_checkpoints/
 
