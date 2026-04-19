@@ -35,3 +35,6 @@ data/raw/run_summaries/*.json
 
 # Private local recovery artifacts
 docs/recovered_session1_chat.txt
+
+# Local evidence/work artifacts
+docs/evidence/
