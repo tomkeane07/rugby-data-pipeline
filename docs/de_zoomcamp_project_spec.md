@@ -132,7 +132,7 @@ Violating any of this will result in 0 points for this project.
 
 ### Datasets
 
-Refer to the provided [datasets](datasets.md) for possible selection.
+Refer to the provided [datasets list](https://github.com/DataTalksClub/data-engineering-zoomcamp/blob/main/projects/datasets.md) for possible selection.
 
 ### Helpful Links
 
@@ -151,8 +151,8 @@ Explore a collection of projects completed by members of our community. The proj
 
 ### DE Zoomcamp 2023
 
-* [2023 Projects](../cohorts/2023/project.md)
+* [2023 Projects](https://github.com/DataTalksClub/data-engineering-zoomcamp/blob/main/cohorts/2023/project.md)
 
 ### DE Zoomcamp 2022
 
-* [2022 Projects](../cohorts/2022/project.md)
+* [2022 Projects](https://github.com/DataTalksClub/data-engineering-zoomcamp/blob/main/cohorts/2022/project.md)

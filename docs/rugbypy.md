@@ -6,7 +6,7 @@
 *8000*+ players, *250*+ teams, *6000*+ games over the 2022, 2023, 2024 &
 2025 seasons - `rugbypy` is a Python package that aims to make rugby
 data more available to aid in the development of rugby analytics.
-Documentation can be found [here](seanyboi.github.io/rugbypy/)
+Documentation can be found [here](https://seanyboi.github.io/rugbypy/)
 
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/rugbypy.png) ![PyPI -
 Python Version](https://img.shields.io/pypi/pyversions/rugbypy.png)

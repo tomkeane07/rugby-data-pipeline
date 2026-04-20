@@ -45,7 +45,7 @@ Coverage and non-null profile:
 Use this command to regenerate the same profile in the project container environment:
 
 ```bash
-cd /home/tomkeane/projects/rugby_data_project && docker compose run --rm python python - <<'PY'
+docker compose run --rm python python - <<'PY'
 from pathlib import Path
 import pandas as pd
 

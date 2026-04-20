@@ -54,9 +54,9 @@ This makes it the temporal graph required by the project specification.
 
 ## Backing Model
 
-The graph is powered by [dbt/rugby_stats/models/marts/vw_league_score_difference_timeseries.sql](/home/tomkeane/projects/rugby_data_project/dbt/rugby_stats/models/marts/vw_league_score_difference_timeseries.sql).
+The graph is powered by [dbt/rugby_stats/models/marts/vw_league_score_difference_timeseries.sql](../../../../dbt/rugby_stats/models/marts/vw_league_score_difference_timeseries.sql).
 
-That view reads from the shared fact model documented in [Fact Model and Data Quality Guards](../shared/fact_model_and_quality_guards.md).
+That view reads from the shared fact model documented in [Fact Model and Data Quality Guards](../../shared/fact_model_and_quality_guards.md).
 
 ## Grain
 
@@ -116,14 +116,14 @@ This graph inherits the score symmetry guarantees from the shared fact model and
 - Each valid match should contribute exactly two rows.
 - The two `score_difference` values for a match should sum to zero.
 
-Those guarantees are documented in [Fact Model and Data Quality Guards](../shared/fact_model_and_quality_guards.md).
+Those guarantees are documented in [Fact Model and Data Quality Guards](../../shared/fact_model_and_quality_guards.md).
 
 ## Shared Dependencies
 
 This graph shares upstream components with the categorical graph:
 
-- [Pipeline Orchestration and Loading](../shared/pipeline_orchestration_and_loading.md)
-- [Fact Model and Data Quality Guards](../shared/fact_model_and_quality_guards.md)
+- [Pipeline Orchestration and Loading](../../shared/pipeline_orchestration_and_loading.md)
+- [Fact Model and Data Quality Guards](../../shared/fact_model_and_quality_guards.md)
 
 ## Known Design Constraint
 

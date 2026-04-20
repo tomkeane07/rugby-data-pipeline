@@ -1,4 +1,4 @@
-.PHONY: help build kestra-up kestra-down kestra-logs fetch-teams fetch-team-stats fetch-match-details ingest-all load-bq dbt-build dbt-test validate-bq dashboard-evidence test-smoke pipeline-local
+.PHONY: help build kestra-up kestra-down kestra-logs fetch-teams fetch-team-stats fetch-match-details ingest-all load-bq dbt-build dbt-test validate-bq dashboard-evidence matplotlib-dashboard test-smoke pipeline-local
 
 COMPOSE = docker compose
 PYTHON = $(COMPOSE) run --rm python
@@ -18,6 +18,7 @@ help:
 	@echo "  make dbt-test            Run dbt test directly"
 	@echo "  make validate-bq         Validate raw BigQuery tables (milestone 4)"
 	@echo "  make dashboard-evidence  Prepare dashboard evidence artifacts (milestone 6)"
+	@echo "  make matplotlib-dashboard Generate Matplotlib versions of dashboard charts"
 	@echo "  make test-smoke          Run fast non-network smoke tests"
 	@echo "  make pipeline-local      ingest-all -> load-bq -> dbt-build"
 
@@ -58,6 +59,9 @@ validate-bq:
 
 dashboard-evidence:
 	$(PYTHON) python scripts/milestone6_prepare_dashboard_evidence.py
+
+matplotlib-dashboard:
+	$(PYTHON) python scripts/generate_matplotlib_dashboard_charts.py
 
 test-smoke:
 	$(PYTHON) sh -lc "PYTHONPATH=/workspace pytest -q tests/smoke"

@@ -52,10 +52,10 @@ That fact table standardises match-level team performance records so downstream 
 
 The shared dbt lineage is:
 
-1. [dbt/rugby_stats/models/staging/stg_team_stats.sql](/home/tomkeane/projects/rugby_data_project/dbt/rugby_stats/models/staging/stg_team_stats.sql)
-2. [dbt/rugby_stats/models/staging/stg_match_details.sql](/home/tomkeane/projects/rugby_data_project/dbt/rugby_stats/models/staging/stg_match_details.sql)
-3. [dbt/rugby_stats/models/intermediate/int_team_game_metrics.sql](/home/tomkeane/projects/rugby_data_project/dbt/rugby_stats/models/intermediate/int_team_game_metrics.sql)
-4. [dbt/rugby_stats/models/marts/fct_team_performance.sql](/home/tomkeane/projects/rugby_data_project/dbt/rugby_stats/models/marts/fct_team_performance.sql)
+1. [dbt/rugby_stats/models/staging/stg_team_stats.sql](../../../dbt/rugby_stats/models/staging/stg_team_stats.sql)
+2. [dbt/rugby_stats/models/staging/stg_match_details.sql](../../../dbt/rugby_stats/models/staging/stg_match_details.sql)
+3. [dbt/rugby_stats/models/intermediate/int_team_game_metrics.sql](../../../dbt/rugby_stats/models/intermediate/int_team_game_metrics.sql)
+4. [dbt/rugby_stats/models/marts/fct_team_performance.sql](../../../dbt/rugby_stats/models/marts/fct_team_performance.sql)
 
 The two graph-specific views are built on top of `fct_team_performance`.
 
@@ -120,14 +120,14 @@ Even though the current two graphs do not use the rolling metrics, keeping them 
 
 ## Data Quality Guards
 
-The strongest shared quality guard is the custom dbt test in [dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql](/home/tomkeane/projects/rugby_data_project/dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql).
+The strongest shared quality guard is the custom dbt test in [dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql](../../../dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql).
 
 It fails if either of the following is true for any `match_id`:
 
 - The match does not have exactly two team rows.
 - The two `score_difference` values do not sum to zero within a small tolerance.
 
-Additional column-level tests are declared in [dbt/rugby_stats/models/marts/marts.yml](/home/tomkeane/projects/rugby_data_project/dbt/rugby_stats/models/marts/marts.yml), including `not_null`, `unique`, and `accepted_values` checks.
+Additional column-level tests are declared in [dbt/rugby_stats/models/marts/marts.yml](../../../dbt/rugby_stats/models/marts/marts.yml), including `not_null`, `unique`, and `accepted_values` checks.
 
 ## Why This Shared Layer Exists
 

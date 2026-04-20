@@ -79,7 +79,7 @@ The graph-specific marts diverge only after the shared fact model is built.
 
 ## Orchestration Layer
 
-The end-to-end job is orchestrated by Kestra in [flows/rugby_pipeline_daily.yml](/home/tomkeane/projects/rugby_data_project/flows/rugby_pipeline_daily.yml).
+The end-to-end job is orchestrated by Kestra in [flows/rugby_pipeline_daily.yml](../../../flows/rugby_pipeline_daily.yml).
 
 The flow runs five tasks in order:
 
@@ -93,7 +93,7 @@ This sequencing matters because downstream steps assume that fresh raw parquet f
 
 ## Extraction Scripts
 
-The main shared extraction logic lives in [scripts/ingest_rugby_data.py](/home/tomkeane/projects/rugby_data_project/scripts/ingest_rugby_data.py), with Kestra invoking the narrower task-specific scripts for teams, team stats, and match details.
+The main shared extraction logic lives in [scripts/ingest_rugby_data.py](../../../scripts/ingest_rugby_data.py), with Kestra invoking the narrower task-specific scripts for teams, team stats, and match details.
 
 Key behaviours in the ingestion pattern:
 
@@ -106,7 +106,7 @@ This raw-zone design keeps the extraction stage simple and auditable. It also al
 
 ## Raw BigQuery Load
 
-The warehouse load step is implemented in [scripts/load_to_bigquery.py](/home/tomkeane/projects/rugby_data_project/scripts/load_to_bigquery.py).
+The warehouse load step is implemented in [scripts/load_to_bigquery.py](../../../scripts/load_to_bigquery.py).
 
 It loads three raw tables:
 
@@ -126,7 +126,7 @@ These storage choices directly support the dashboard workload, which commonly fi
 
 ## dbt Build Step
 
-The transformation step is launched by [scripts/run_dbt.py](/home/tomkeane/projects/rugby_data_project/scripts/run_dbt.py).
+The transformation step is launched by [scripts/run_dbt.py](../../../scripts/run_dbt.py).
 
 The script runs:
 

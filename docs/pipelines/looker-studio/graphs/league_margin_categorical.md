@@ -50,9 +50,9 @@ This makes it the categorical graph required by the project specification.
 
 ## Backing Model
 
-The graph is powered by [dbt/rugby_stats/models/marts/vw_league_margin_categorical.sql](/home/tomkeane/projects/rugby_data_project/dbt/rugby_stats/models/marts/vw_league_margin_categorical.sql).
+The graph is powered by [dbt/rugby_stats/models/marts/vw_league_margin_categorical.sql](../../../../dbt/rugby_stats/models/marts/vw_league_margin_categorical.sql).
 
-That view reads from the shared fact model documented in [Fact Model and Data Quality Guards](../shared/fact_model_and_quality_guards.md).
+That view reads from the shared fact model documented in [Fact Model and Data Quality Guards](../../shared/fact_model_and_quality_guards.md).
 
 ## Grain
 
@@ -113,8 +113,8 @@ The chart should make it clear whether it is presenting average margin, median m
 
 This graph shares upstream components with the timeseries graph:
 
-- [Pipeline Orchestration and Loading](../shared/pipeline_orchestration_and_loading.md)
-- [Fact Model and Data Quality Guards](../shared/fact_model_and_quality_guards.md)
+- [Pipeline Orchestration and Loading](../../shared/pipeline_orchestration_and_loading.md)
+- [Fact Model and Data Quality Guards](../../shared/fact_model_and_quality_guards.md)
 
 ## Known Design Constraint
 

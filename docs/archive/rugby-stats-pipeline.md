@@ -1,5 +1,9 @@
 # Rugby Team Performance Dashboard — Project Roadmap
 
+> Note: This is an early planning document kept for historical context. It is not the current as-built source of truth.
+>
+> For current implementation details, see `README.md`, `flows/rugby_pipeline_daily.yml`, `docs/pipelines/looker-studio/README.md`, and `docs/pipelines/matplotlib/README.md`.
+
 ## Problem Statement
 
 Rugby analytics data is hard to access and visualise in aggregate. This project builds an end-to-end batch data pipeline using the `rugbypy` Python package to ingest team performance statistics across the 2022–2025 seasons, store them in a cloud data warehouse, and expose insights via an interactive dashboard. The dashboard will help analysts and fans understand how team performance metrics (tries, line breaks, territory) vary across competitions and evolve over time.
@@ -121,6 +125,8 @@ gs://rugby-data-lake/
 **Tile 1 — Temporal**: Line chart of average tries/line breaks per game month across the 2022–2025 seasons, filterable by team.
 
 **Tile 2 — Categorical**: Bar chart of average territory % and 22m entries grouped by team, filterable by season.
+
+For code-first dashboard images generated with Matplotlib (including one time-series chart per league), see `docs/pipelines/matplotlib/README.md`.
 
 ---
 
