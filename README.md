@@ -84,7 +84,8 @@ flowchart LR
 ## Configuration
 
 1. Copy `.env.example` to `.env` and set your values.
-2. Ensure `infra/terraform/terraform.tfvars` uses the same project and bucket naming convention.
+2. Copy `infra/terraform/terraform.tfvars.example` to `infra/terraform/terraform.tfvars` and set values if you will provision infrastructure from scratch.
+3. Ensure `.env` and `infra/terraform/terraform.tfvars` use the same project and bucket naming convention.
 
 ## Makefile Commands
 
@@ -100,6 +101,12 @@ Run `make help` to see all targets. Common ones:
 - `make matplotlib-dashboard`: generate Matplotlib dashboard charts to `docs/assets/matplotlib/`
 - `make test-smoke`: run fast non-network smoke tests
 - `make pipeline-local`: run `ingest-all -> load-bq -> dbt-build`
+
+Load behavior note:
+
+- `teams`: latest `teams_*.parquet` snapshot
+- `team_stats`: all `data/raw/team_stats/*.parquet` files
+- `match_details`: latest `match_details_*.parquet` snapshot (prevents duplicate `match_id` records from historical snapshots)
 
 ### Matplotlib Dashboard Pipeline
 
@@ -130,73 +137,84 @@ The project has two documented delivery variants:
 
 Run from repository root.
 
-Set environment variables first:
+1. Clone and enter the repository:
 
-```bash
-export GCP_PROJECT_ID=your-gcp-project-id
-export BQ_DATASET_RAW=raw
-export BQ_DATASET_ANALYTICS=raw
-export GOOGLE_APPLICATION_CREDENTIALS=/workspace/secrets/cloud_key.json
-```
+  git clone https://github.com/tomkeane/rugby_data_project.git
+  cd rugby_data_project
 
-1. Start Kestra stack:
+2. Create local configuration files:
 
-```bash
-make kestra-up
-```
+  cp .env.example .env
+  cp infra/terraform/terraform.tfvars.example infra/terraform/terraform.tfvars
 
-2. Trigger the daily flow (UI or API):
+3. Update `.env` and verify service account key path:
+- Required key file location: `secrets/cloud_key.json`
+- Keep `.env` values aligned with your GCP project and BigQuery datasets
+- Dataset boundary: raw ingestion tables are written to `BQ_DATASET_RAW`; dbt models are written to `BQ_DATASET_ANALYTICS`.
+
+4. Export environment variables for local commands:
+
+  export GCP_PROJECT_ID=your-gcp-project-id
+  export BQ_DATASET_RAW=raw
+  export BQ_DATASET_ANALYTICS=analytics
+  export GOOGLE_APPLICATION_CREDENTIALS=/workspace/secrets/cloud_key.json
+
+5. Optional: provision infrastructure on a brand new cloud setup:
+
+  cd infra/terraform
+  terraform init
+  terraform plan
+  terraform apply
+  cd ../..
+
+6. Build the runtime image required by Kestra flow tasks:
+
+  make build
+
+7. Start Kestra stack:
+
+  make kestra-up
+
+8. Trigger the daily flow (UI or API):
 
 - UI: `http://localhost:8080`
 - Flow: `rugby.rugby_pipeline_daily`
 
-3. Validate raw BigQuery tables (Milestone 4 utility):
+9. Validate raw BigQuery tables (Milestone 4 utility):
 
-```bash
-make validate-bq
-```
+  make validate-bq
 
-4. Validate dbt models/tests/docs (Milestone 5):
+10. Validate dbt models/tests/docs (Milestone 5):
 
-```bash
-make dbt-build
-```
+  make dbt-build
 
-5. (Optional) Generate dashboard query/checklist artifacts:
+11. Optional: generate dashboard query/checklist artifacts:
 
-```bash
-make dashboard-evidence
-```
+  make dashboard-evidence
 
 Optional local end-to-end run (outside Kestra):
 
-```bash
-make pipeline-local
-```
+  make pipeline-local
 
 
 ## Dashboard Tile Validation
 
 1. Tile 1 (categorical distribution): `vw_league_margin_categorical`
    - Expected fields: `league_name`, `avg_match_margin`, `median_match_margin`, `matches`
-   - Quick check query:
+  - Quick check query (replace placeholders with your values):
 
-```sql
-select league_name, matches, avg_match_margin, median_match_margin
-from `rugby-datatalks-pipeline.raw.vw_league_margin_categorical`
-order by league_name;
-```
+   select league_name, matches, avg_match_margin, median_match_margin
+   from `YOUR_GCP_PROJECT_ID.YOUR_BQ_DATASET_ANALYTICS.vw_league_margin_categorical`
+   order by league_name;
 
 2. Tile 2 (temporal distribution): `vw_league_score_difference_timeseries`
    - Expected fields: `match_id`, `match_label`, `game_date`, `team_name`, `score_difference`, `league_name`
-   - Quick check query:
+  - Quick check query (replace placeholders with your values):
 
-```sql
-select game_date, match_id, match_label, team_name, score_difference, league_name
-from `rugby-datatalks-pipeline.raw.vw_league_score_difference_timeseries`
-order by game_date desc
-limit 20;
-```
+   select game_date, match_id, match_label, team_name, score_difference, league_name
+   from `YOUR_GCP_PROJECT_ID.YOUR_BQ_DATASET_ANALYTICS.vw_league_score_difference_timeseries`
+   order by game_date desc
+   limit 20;
 
 3. Data quality guard (score symmetry):
    - `dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql`
@@ -214,6 +232,66 @@ limit 20;
 - Looker Studio pipeline documentation: `docs/pipelines/looker-studio/README.md`
 - Matplotlib pipeline documentation: `docs/pipelines/matplotlib/README.md`
 - rugbypy source notes: `docs/rugbypy.md`
+
+## DE Zoomcamp Rubric Mapping
+
+Use this section to quickly verify where each scoring criterion is evidenced.
+
+1. Problem description
+- Project objective and scope: `docs/de_zoomcamp_project_spec.md`
+- End-to-end goal and business intent: `README.md` sections Project Goal and Architecture Overview
+
+2. Cloud
+- Warehouse and analytics platform: BigQuery
+- Infrastructure as code: `infra/terraform/`
+- Credentials and project configuration flow: Prerequisites + Configuration sections above
+
+3. Data ingestion (batch + orchestration)
+- Scheduled orchestration flow: `flows/rugby_pipeline_daily.yml`
+- End-to-end task chain: fetch -> raw files -> BigQuery load -> dbt
+- Local reproducible equivalent: `make pipeline-local`
+
+4. Data warehouse
+- Raw and analytics datasets in BigQuery
+- Optimization strategy:
+  - Partitioning: `team_stats` partitioned by `game_date`
+  - Clustering: `team_stats` clustered by `team_id`
+- Rationale is documented in Notes section below
+
+5. Transformations
+- dbt project: `dbt/rugby_stats/`
+- Build + tests entrypoint: `make dbt-build`
+- Custom data quality test example: `dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql`
+
+6. Dashboard
+- Tile 1 (categorical): `vw_league_margin_categorical`
+- Tile 2 (temporal): `vw_league_score_difference_timeseries`
+- Validation queries and required fields: Dashboard Tile Validation section
+- Evidence artifacts: `docs/assets/looker-studio/` and `docs/assets/matplotlib/`
+
+7. Reproducibility
+- Full runbook: Reproduction Steps section
+- One-command orchestration startup: `make kestra-up`
+- End-to-end local run: `make pipeline-local`
+- Validation and evidence generation:
+  - `make validate-bq`
+  - `make dbt-build`
+  - `make dashboard-evidence`
+
+## Reviewer Quick Audit (10 Checks)
+
+Use this as a fast pass before assigning final points.
+
+- [ ] Is the problem statement clear and specific?
+- [ ] Is cloud infrastructure actually used (not local-only)?
+- [ ] Is IaC present and linked to concrete resources?
+- [ ] Is ingestion orchestrated end-to-end (not partial/manual)?
+- [ ] Is a data lake layer present and used in the pipeline?
+- [ ] Is a warehouse layer present and query-ready?
+- [ ] Is DWH optimization evidenced (partitioning/clustering) with rationale?
+- [ ] Are dbt transformations implemented and testable via `dbt build`?
+- [ ] Does the dashboard clearly include both a categorical and a temporal view?
+- [ ] Can a reviewer reproduce the pipeline from setup to validation using documented commands?
 
 ### Looker Studio Report Preview
 

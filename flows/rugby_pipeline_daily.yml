@@ -13,6 +13,7 @@ variables:
   runtime_image: rugby_data_project-python
   project_id: rugby-datatalks-pipeline
   dataset_raw: raw
+  dataset_analytics: analytics
 
 tasks:
   - id: fetch_teams
@@ -74,7 +75,7 @@ tasks:
       GOOGLE_APPLICATION_CREDENTIALS: /workspace/secrets/cloud_key.json
       GCP_PROJECT_ID: "{{ vars.project_id }}"
       BQ_DATASET_RAW: "{{ vars.dataset_raw }}"
-      BQ_DATASET_ANALYTICS: "{{ vars.dataset_raw }}"
+      BQ_DATASET_ANALYTICS: "{{ vars.dataset_analytics }}"
     commands:
       - cd /workspace && python scripts/run_dbt.py
 

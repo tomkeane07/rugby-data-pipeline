@@ -116,7 +116,9 @@ It loads three raw tables:
 
 Important implementation details:
 
-- Raw parquet files are concatenated into pandas DataFrames before upload.
+- `teams` loads from the latest `teams_*.parquet` snapshot.
+- `team_stats` loads by concatenating all files in `data/raw/team_stats/*.parquet`.
+- `match_details` loads from the latest `match_details_*.parquet` snapshot to avoid duplicate `match_id` values across historical snapshot files.
 - Object columns containing lists or dictionaries are JSON-serialized so BigQuery receives scalar-compatible values.
 - `game_date` is normalized to a date type before loading.
 - `raw.team_stats` is partitioned by `game_date` and clustered by `team_id`.

@@ -34,19 +34,23 @@ def main() -> None:
     teams_file = _latest_file(Path("data/raw/teams"), "teams_*.parquet")
     team_stats_files = sorted(Path("data/raw/team_stats").glob("*.parquet"))
     match_details_files = sorted(Path("data/raw/match_details").glob("match_details_*.parquet"))
+    latest_match_details_file = match_details_files[-1] if match_details_files else None
 
     if not team_stats_files:
         raise FileNotFoundError("No team_stats parquet files found in data/raw/team_stats")
 
     print(f"[load_to_bigquery] Using teams file: {teams_file}")
     print(f"[load_to_bigquery] team_stats files: {len(team_stats_files)}")
-    print(f"[load_to_bigquery] match_details files: {len(match_details_files)}")
+    print(
+        "[load_to_bigquery] match_details file: "
+        f"{latest_match_details_file if latest_match_details_file else 'none'}"
+    )
 
     teams_df = pd.read_parquet(teams_file)
     stats_df = pd.concat((pd.read_parquet(f) for f in team_stats_files), ignore_index=True)
     match_details_df = (
-        pd.concat((pd.read_parquet(f) for f in match_details_files), ignore_index=True)
-        if match_details_files
+        pd.read_parquet(latest_match_details_file)
+        if latest_match_details_file
         else pd.DataFrame(columns=["match_id", "game_date", "season", "competition_id", "competition_name"])
     )
 
@@ -111,7 +115,7 @@ def main() -> None:
         "team_stats_rows": stats_rows,
         "match_details_rows": match_details_rows,
         "team_stats_files_loaded": len(team_stats_files),
-        "match_details_files_loaded": len(match_details_files),
+        "match_details_files_loaded": 1 if latest_match_details_file else 0,
     }
 
     summary_path = Path("data/raw/run_summaries") / f"load_to_bigquery_summary_{datetime.utcnow().strftime('%Y%m%d')}.json"
