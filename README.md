@@ -147,6 +147,33 @@ docker run --rm \
   python scripts/milestone6_prepare_dashboard_evidence.py
 ```
 
+  ## Dashboard Tile Validation
+
+  1. Tile 1 (categorical distribution): `vw_league_margin_categorical`
+    - Expected fields: `league_name`, `avg_match_margin`, `median_match_margin`, `matches`
+    - Quick check query:
+
+  ```sql
+  select league_name, matches, avg_match_margin, median_match_margin
+  from `rugby-datatalks-pipeline.raw.vw_league_margin_categorical`
+  order by league_name;
+  ```
+
+  2. Tile 2 (temporal distribution): `vw_league_score_difference_timeseries`
+    - Expected fields: `match_id`, `match_label`, `game_date`, `team_name`, `score_difference`, `league_name`
+    - Quick check query:
+
+  ```sql
+  select game_date, match_id, match_label, team_name, score_difference, league_name
+  from `rugby-datatalks-pipeline.raw.vw_league_score_difference_timeseries`
+  order by game_date desc
+  limit 20;
+  ```
+
+  3. Data quality guard (score symmetry):
+    - `dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql`
+    - `docs/score_difference_data_quality.md`
+
 ## Deliverables
 
 - Final report PDF: `Copy_of_rugby-datatalks-report.pdf`
