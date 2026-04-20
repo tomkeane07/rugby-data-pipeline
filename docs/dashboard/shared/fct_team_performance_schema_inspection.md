@@ -88,3 +88,5 @@ limit 50;
 ```
 
 Then narrow to relevant columns and aggregate at the target graph grain.
+
+For ruck-related development, read [Ruck Data Availability Profile](./ruck_data_availability_profile.md) before modeling so you account for field-level sparsity and schema drift.

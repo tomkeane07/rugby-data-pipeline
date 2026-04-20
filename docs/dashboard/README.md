@@ -12,6 +12,7 @@ This directory documents the two dashboard graphs delivered for the project and 
 - [Pipeline Orchestration and Loading](./shared/pipeline_orchestration_and_loading.md)
 - [Fact Model and Data Quality Guards](./shared/fact_model_and_quality_guards.md)
 - [Inspecting fct_team_performance Schema](./shared/fct_team_performance_schema_inspection.md)
+- [Ruck Data Availability Profile](./shared/ruck_data_availability_profile.md)
 
 ## Recommended Reading Order
 
