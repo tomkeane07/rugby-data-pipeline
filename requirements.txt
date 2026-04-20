@@ -12,3 +12,4 @@ dbt-duckdb
 dbt-bigquery
 google-cloud-bigquery
 pyarrow
+pytest

@@ -69,6 +69,7 @@ flowchart LR
 - `dbt/rugby_stats/`: dbt project with staging/intermediate/marts models and tests
 - `infra/terraform/`: Terraform configuration for infrastructure setup
 - `docs/`: project objective and technical documentation
+- `docs/testing.md`: smoke test usage and validation workflow
 - `docs/assets/screenshots/`: report page screenshots used in this README
 - `Copy_of_rugby-datatalks-report.pdf`: final submission report deliverable
 
@@ -82,6 +83,20 @@ flowchart LR
 
 1. Copy `.env.example` to `.env` and set your values.
 2. Ensure `infra/terraform/terraform.tfvars` uses the same project and bucket naming convention.
+
+## Makefile Commands
+
+Run `make help` to see all targets. Common ones:
+
+- `make build`: build the python container image
+- `make kestra-up`: start Kestra stack
+- `make ingest-all`: run fetch teams + team stats + match details
+- `make load-bq`: load parquet files into BigQuery raw tables
+- `make dbt-build`: run dbt build and tests
+- `make validate-bq`: run milestone 4 BigQuery validations
+- `make dashboard-evidence`: run milestone 6 dashboard evidence script
+- `make test-smoke`: run fast non-network smoke tests
+- `make pipeline-local`: run `ingest-all -> load-bq -> dbt-build`
 
 ## Reproduction Steps
 
@@ -99,7 +114,7 @@ export GOOGLE_APPLICATION_CREDENTIALS=/workspace/secrets/cloud_key.json
 1. Start Kestra stack:
 
 ```bash
-docker compose -f docker-compose.kestra.yml up -d
+make kestra-up
 ```
 
 2. Trigger the daily flow (UI or API):
@@ -110,69 +125,54 @@ docker compose -f docker-compose.kestra.yml up -d
 3. Validate raw BigQuery tables (Milestone 4 utility):
 
 ```bash
-docker run --rm \
-  -v $PWD:/workspace \
-  -w /workspace \
-  -e GOOGLE_APPLICATION_CREDENTIALS=/workspace/secrets/cloud_key.json \
-  -e GCP_PROJECT_ID=$GCP_PROJECT_ID \
-  -e BQ_DATASET_RAW=$BQ_DATASET_RAW \
-  rugby_data_project-python:latest \
-  python scripts/milestone4_validate_bq.py
+make validate-bq
 ```
 
 4. Validate dbt models/tests/docs (Milestone 5):
 
 ```bash
-docker run --rm \
-  -v $PWD:/workspace \
-  -w /workspace \
-  -e GOOGLE_APPLICATION_CREDENTIALS=/workspace/secrets/cloud_key.json \
-  -e GCP_PROJECT_ID=$GCP_PROJECT_ID \
-  -e BQ_DATASET_RAW=$BQ_DATASET_RAW \
-  -e BQ_DATASET_ANALYTICS=$BQ_DATASET_ANALYTICS \
-  rugby_data_project-python:latest \
-  dbt build --project-dir dbt/rugby_stats --profiles-dir dbt/rugby_stats
+make dbt-build
 ```
 
 5. (Optional) Generate dashboard query/checklist artifacts:
 
 ```bash
-docker run --rm \
-  -v $PWD:/workspace \
-  -w /workspace \
-  -e GOOGLE_APPLICATION_CREDENTIALS=/workspace/secrets/cloud_key.json \
-  -e GCP_PROJECT_ID=$GCP_PROJECT_ID \
-  -e BQ_DATASET_RAW=$BQ_DATASET_RAW \
-  rugby_data_project-python:latest \
-  python scripts/milestone6_prepare_dashboard_evidence.py
+make dashboard-evidence
 ```
 
-  ## Dashboard Tile Validation
+Optional local end-to-end run (outside Kestra):
 
-  1. Tile 1 (categorical distribution): `vw_league_margin_categorical`
-    - Expected fields: `league_name`, `avg_match_margin`, `median_match_margin`, `matches`
-    - Quick check query:
+```bash
+make pipeline-local
+```
 
-  ```sql
-  select league_name, matches, avg_match_margin, median_match_margin
-  from `rugby-datatalks-pipeline.raw.vw_league_margin_categorical`
-  order by league_name;
-  ```
 
-  2. Tile 2 (temporal distribution): `vw_league_score_difference_timeseries`
-    - Expected fields: `match_id`, `match_label`, `game_date`, `team_name`, `score_difference`, `league_name`
-    - Quick check query:
+## Dashboard Tile Validation
 
-  ```sql
-  select game_date, match_id, match_label, team_name, score_difference, league_name
-  from `rugby-datatalks-pipeline.raw.vw_league_score_difference_timeseries`
-  order by game_date desc
-  limit 20;
-  ```
+1. Tile 1 (categorical distribution): `vw_league_margin_categorical`
+   - Expected fields: `league_name`, `avg_match_margin`, `median_match_margin`, `matches`
+   - Quick check query:
 
-  3. Data quality guard (score symmetry):
-    - `dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql`
-    - `docs/score_difference_data_quality.md`
+```sql
+select league_name, matches, avg_match_margin, median_match_margin
+from `rugby-datatalks-pipeline.raw.vw_league_margin_categorical`
+order by league_name;
+```
+
+2. Tile 2 (temporal distribution): `vw_league_score_difference_timeseries`
+   - Expected fields: `match_id`, `match_label`, `game_date`, `team_name`, `score_difference`, `league_name`
+   - Quick check query:
+
+```sql
+select game_date, match_id, match_label, team_name, score_difference, league_name
+from `rugby-datatalks-pipeline.raw.vw_league_score_difference_timeseries`
+order by game_date desc
+limit 20;
+```
+
+3. Data quality guard (score symmetry):
+   - `dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql`
+   - `docs/score_difference_data_quality.md`
 
 ## Deliverables
 
