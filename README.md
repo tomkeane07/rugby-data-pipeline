@@ -19,6 +19,49 @@ Build a reproducible data pipeline that:
 - Transformations: dbt (`dbt/rugby_stats`)
 - Dashboard: Looker Studio
 
+## Architecture Overview
+
+```mermaid
+flowchart LR
+  classDef source fill:#f3efe2,stroke:#7a5c2e,color:#2f2416,stroke-width:1px;
+  classDef ingest fill:#d9ead3,stroke:#4f7a52,color:#1f3b21,stroke-width:1px;
+  classDef raw fill:#dbe7f7,stroke:#4f6b8a,color:#1d2d44,stroke-width:1px;
+  classDef transform fill:#fde7c8,stroke:#b7791f,color:#4a2b00,stroke-width:1px;
+  classDef serve fill:#f7d9d9,stroke:#9b4d4d,color:#4a1f1f,stroke-width:1px;
+
+  subgraph S1[Source]
+    A[rugbypy API]
+  end
+
+  subgraph S2[Extraction and Orchestration]
+    B[Kestra daily flow]
+    C[Python fetch scripts]
+  end
+
+  subgraph S3[Raw Storage]
+    D[data/raw/*.parquet]
+    E[BigQuery raw tables]
+  end
+
+  subgraph S4[Transformations]
+    F[dbt staging and intermediate models]
+    G[fct_team_performance]
+    H[dashboard marts]
+  end
+
+  subgraph S5[Analytics Delivery]
+    I[Looker Studio dashboard]
+  end
+
+  A --> B --> C --> D --> E --> F --> G --> H --> I
+
+  class A source;
+  class B,C ingest;
+  class D,E raw;
+  class F,G,H transform;
+  class I serve;
+```
+
 ## Repository Structure
 
 - `flows/rugby_pipeline_daily.yml`: Kestra flow (5 tasks: fetch teams, team stats, match details, load, dbt)
