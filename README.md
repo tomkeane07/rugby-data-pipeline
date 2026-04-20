@@ -73,8 +73,7 @@ flowchart LR
 - `infra/terraform/`: Terraform configuration for infrastructure setup
 - `docs/`: project objective and technical documentation
 - `docs/testing.md`: smoke test usage and validation workflow
-- `docs/assets/screenshots/`: report page screenshots used in this README
-- `Copy_of_rugby-datatalks-report.pdf`: final submission report deliverable
+- `docs/assets/looker-studio/`: Looker Studio screenshots and report PDF used in this README
 
 ## Prerequisites
 
@@ -205,10 +204,10 @@ limit 20;
 
 ## Deliverables
 
-- Final report PDF: `Copy_of_rugby-datatalks-report.pdf`
+- Final report PDF: `docs/assets/looker-studio/Copy_of_rugby-datatalks-report.pdf`
 - Report page screenshots:
-  - `docs/assets/screenshots/report-page-1.png`
-  - `docs/assets/screenshots/report-page-2.png`
+  - `docs/assets/looker-studio/report-page-1.png`
+  - `docs/assets/looker-studio/report-page-2.png`
 - Score-difference data quality remediation: `docs/score_difference_data_quality.md`
 - Project objective: `docs/de_zoomcamp_project_spec.md`
 - Historical project roadmap (planning snapshot): `docs/archive/rugby-stats-pipeline.md`
@@ -222,9 +221,9 @@ The screenshots below are included as a quick preview of the submitted report de
 
 Some score differences in the screenshots and PDF may appear one-sided. This is a known source-data limitation from the upstream API: certain teams are labelled as `"other"`, so the corresponding warehouse row exists but is not attributed to a named team in the rendered report. The pipeline data and symmetry test remain correct; the visual asymmetry reflects this naming gap in the source rather than a transformation error.
 
-![Report page 1](docs/assets/screenshots/report-page-1.png)
+![Report page 1](docs/assets/looker-studio/report-page-1.png)
 
-![Report page 2](docs/assets/screenshots/report-page-2.png)
+![Report page 2](docs/assets/looker-studio/report-page-2.png)
 
 ### Matplotlib Report Preview
 
