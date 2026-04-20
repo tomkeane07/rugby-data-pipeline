@@ -108,6 +108,22 @@ Load behavior note:
 - `team_stats`: all `data/raw/team_stats/*.parquet` files
 - `match_details`: latest `match_details_*.parquet` snapshot (prevents duplicate `match_id` records from historical snapshots)
 
+### Looker Studio Dashboard Pipeline
+
+Use this when you want BI-first delivery with reviewer-friendly evidence artifacts.
+
+```bash
+make dashboard-evidence
+```
+
+Current behavior:
+
+- Produces SQL checks and dashboard validation notes used for report QA
+- Keeps tile requirements aligned with analytics views consumed by Looker Studio
+- Supports milestone-style evidence packaging alongside screenshots and report PDF
+
+See full documentation: `docs/pipelines/looker-studio/README.md`.
+
 ### Matplotlib Dashboard Pipeline
 
 Use this when you want programmatic chart outputs stored in the repo.
@@ -197,7 +213,9 @@ Optional local end-to-end run (outside Kestra):
   make pipeline-local
 
 
-## Dashboard Tile Validation
+## Dashboard Validation
+
+### Looker Studio Tile Validation
 
 1. Tile 1 (categorical distribution): `vw_league_margin_categorical`
    - Expected fields: `league_name`, `avg_match_margin`, `median_match_margin`, `matches`
@@ -220,12 +238,35 @@ Optional local end-to-end run (outside Kestra):
    - `dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql`
    - `docs/score_difference_data_quality.md`
 
+### Matplotlib Artifact Validation
+
+1. Generate artifacts:
+
+  make matplotlib-dashboard
+
+2. Confirm categorical chart exists:
+  - `docs/assets/matplotlib/league_margin_categorical_matplotlib.png`
+
+3. Confirm league time-series charts exist:
+  - `docs/assets/matplotlib/league_score_difference_timeseries_european_rugby_challenge_cup.png`
+  - `docs/assets/matplotlib/league_score_difference_timeseries_european_rugby_champions_cup.png`
+  - `docs/assets/matplotlib/league_score_difference_timeseries_super_rugby_pacific.png`
+
+4. Data quality guard (shared with Looker Studio):
+  - `dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql`
+  - `docs/score_difference_data_quality.md`
+
 ## Deliverables
 
 - Final report PDF: `docs/assets/looker-studio/Copy_of_rugby-datatalks-report.pdf`
 - Report page screenshots:
   - `docs/assets/looker-studio/report-page-1.png`
   - `docs/assets/looker-studio/report-page-2.png`
+- Matplotlib dashboard chart artifacts:
+  - `docs/assets/matplotlib/league_margin_categorical_matplotlib.png`
+  - `docs/assets/matplotlib/league_score_difference_timeseries_european_rugby_challenge_cup.png`
+  - `docs/assets/matplotlib/league_score_difference_timeseries_european_rugby_champions_cup.png`
+  - `docs/assets/matplotlib/league_score_difference_timeseries_super_rugby_pacific.png`
 - Score-difference data quality remediation: `docs/score_difference_data_quality.md`
 - Project objective: `docs/de_zoomcamp_project_spec.md`
 - Historical project roadmap (planning snapshot): `docs/archive/rugby-stats-pipeline.md`
