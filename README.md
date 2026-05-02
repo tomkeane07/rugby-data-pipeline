@@ -44,57 +44,64 @@ Note: `dbt-duckdb==1.10.1` is installed in the environment, but this pipeline's 
 Parquet extracts stored in `data/raw/` are the data lake layer, then loaded into BigQuery raw tables for warehouse processing.
 
 ```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 30, "rankSpacing": 60, "diagramPadding": 8}, "themeVariables": {"fontSize": "18px", "lineColor": "#b22222", "titleColor": "#1a1a1a"}} }%%
 flowchart LR
-  classDef source fill:#f3efe2,stroke:#7a5c2e,color:#2f2416,stroke-width:1px;
-  classDef ingest fill:#d9ead3,stroke:#4f7a52,color:#1f3b21,stroke-width:1px;
-  classDef raw fill:#dbe7f7,stroke:#4f6b8a,color:#1d2d44,stroke-width:1px;
-  classDef transform fill:#fde7c8,stroke:#b7791f,color:#4a2b00,stroke-width:1px;
-  classDef serve fill:#f7d9d9,stroke:#9b4d4d,color:#4a1f1f,stroke-width:1px;
+  classDef source fill:#f3efe2,stroke:#7a5c2e,color:#2f2416,stroke-width:2px;
+  classDef host fill:#d9ead3,stroke:#4f7a52,color:#1f3b21,stroke-width:2px;
+  classDef cloud fill:#dbe7f7,stroke:#4f6b8a,color:#1d2d44,stroke-width:2px;
+  classDef serve fill:#f7d9d9,stroke:#9b4d4d,color:#4a1f1f,stroke-width:2px;
+  classDef phase fill:#fff7e6,stroke:#8a6d3b,color:#4a2b00,stroke-dasharray: 4 2;
 
-  subgraph S1[Source]
+  subgraph INTERNET["🌐 External Source"]
     A[rugbypy API]
   end
 
-  subgraph S2[Extraction and Orchestration]
-    B[Kestra daily flow]
-    C[Python fetch scripts]
+  subgraph HOST["🖥️ Host Machine"]
+    H1([Acquire and Land])
+    B[Kestra flow]
+    C[Raw parquet]
   end
 
-  subgraph S3[Raw Storage]
-    D[data/raw/*.parquet]
-    E[BigQuery raw tables]
+  subgraph GCP["☁️ Google Cloud"]
+    G1([Model and Serve])
+    D[BigQuery raw plus dbt marts]
+    E[Looker Studio outputs]
   end
 
-  subgraph S4[Transformations]
-    F[dbt staging and intermediate models]
-    G[fct_team_performance]
-    H[dashboard marts]
-  end
+  A --> B --> C
+  C -. load to cloud .-> D
+  D --> E
+  D -. export .-> F[Matplotlib artifacts]
 
-  subgraph S5[Analytics Delivery Variants]
-    I[Looker Studio dashboard]
-    J[Matplotlib chart artifacts]
-  end
-
-  A --> B --> C --> D --> E --> F --> G --> H --> I
-  H --> J
+  H1 --> B
+  H1 --> C
+  G1 --> D
+  G1 --> E
 
   class A source;
-  class B,C ingest;
-  class D,E raw;
-  class F,G,H transform;
-  class I,J serve;
+  class B,C,F host;
+  class D cloud;
+  class E serve;
+  class H1,G1 phase;
+
+  linkStyle default stroke:#b22222,stroke-width:2.5px,opacity:1;
+
+  style INTERNET fill:#fff8ec,stroke:#7a5c2e,stroke-width:2px
+  style HOST fill:#eff9ef,stroke:#4f7a52,stroke-width:2px
+  style GCP fill:#eef5ff,stroke:#4f6b8a,stroke-width:2px
 ```
+
+A more detailed architecture diagram is available in [docs/pipelines/shared/README.md](docs/pipelines/shared/README.md).
 
 ## Repository Structure
 
-- `flows/rugby_pipeline_daily.yml`: Kestra flow (5 tasks: fetch teams, team stats, match details, load, dbt)
-- `scripts/`: ingestion, load, and dbt execution scripts
-- `dbt/rugby_stats/`: dbt project with staging/intermediate/marts models and tests
-- `infra/terraform/`: Terraform configuration for infrastructure setup
-- `docs/`: project objective and technical documentation
-- `docs/testing.md`: smoke test usage and validation workflow
-- `docs/assets/looker-studio/`: Looker Studio screenshots and report PDF used in this README
+- [flows/rugby_pipeline_daily.yml](flows/rugby_pipeline_daily.yml): Kestra flow (5 tasks: fetch teams, team stats, match details, load, dbt)
+- [scripts/](scripts/): ingestion, load, and dbt execution scripts
+- [dbt/rugby_stats/](dbt/rugby_stats/): dbt project with staging/intermediate/marts models and tests
+- [infra/terraform/](infra/terraform/): Terraform configuration for infrastructure setup
+- [docs/](docs/): project objective and technical documentation
+- [docs/testing.md](docs/testing.md): smoke test usage and validation workflow
+- [docs/assets/looker-studio/](docs/assets/looker-studio/): Looker Studio screenshots and report PDF used in this README
 
 ## Prerequisites
 
@@ -122,7 +129,7 @@ Run `make help` to see all targets. Common ones:
 - `make dbt-build`: run dbt build and tests
 - `make validate-bq`: run milestone 4 BigQuery validations
 - `make dashboard-evidence`: run milestone 6 dashboard evidence script
-- `make matplotlib-dashboard`: generate Matplotlib dashboard charts to `docs/assets/matplotlib/`
+- `make matplotlib-dashboard`: generate Matplotlib dashboard charts to [docs/assets/matplotlib/](docs/assets/matplotlib/)
 - `make test-smoke`: run fast non-network smoke tests
 - `make pipeline-local`: run `ingest-all -> load-bq -> dbt-build`
 
@@ -146,7 +153,7 @@ Current behavior:
 - Keeps tile requirements aligned with analytics views consumed by Looker Studio
 - Supports milestone-style evidence packaging alongside screenshots and report PDF
 
-See full documentation: `docs/pipelines/looker-studio/README.md`.
+See full documentation: [docs/pipelines/looker-studio/README.md](docs/pipelines/looker-studio/README.md).
 
 ### Matplotlib Dashboard Pipeline
 
@@ -163,15 +170,15 @@ Current behavior:
 - All teams plotted by default (optional cap via `MPL_MAX_TEAMS_PER_LEAGUE`)
 - Compact legends with configurable limits
 
-See full documentation: `docs/pipelines/matplotlib/README.md`.
+See full documentation: [docs/pipelines/matplotlib/README.md](docs/pipelines/matplotlib/README.md).
 
 ### Pipeline Documentation Structure
 
 The project has two documented delivery variants:
 
-- Looker Studio pipeline docs: `docs/pipelines/looker-studio/README.md`
-- Matplotlib pipeline docs: `docs/pipelines/matplotlib/README.md`
-- Combined index: `docs/pipelines/README.md`
+- Looker Studio pipeline docs: [docs/pipelines/looker-studio/README.md](docs/pipelines/looker-studio/README.md)
+- Matplotlib pipeline docs: [docs/pipelines/matplotlib/README.md](docs/pipelines/matplotlib/README.md)
+- Combined index: [docs/pipelines/README.md](docs/pipelines/README.md)
 
 ## Reproduction Steps
 
@@ -243,7 +250,7 @@ Optional local end-to-end run (outside Kestra):
 
 **To recreate the live dashboard**: 
 - Live report: [Looker Studio Report](https://datastudio.google.com/reporting/5ad118e2-45bb-4b7c-908c-6196c9b91ef7)
-- Report screenshots and PDF evidence: `docs/assets/looker-studio/`
+- Report screenshots and PDF evidence: [docs/assets/looker-studio/](docs/assets/looker-studio/)
 - To create a new Looker Studio report from scratch, use the same BigQuery datasource and BigQuery connector configuration. Chart tiles should connect to:
   - Tile 1: `vw_league_margin_categorical`
   - Tile 2: `vw_league_score_difference_timeseries`
@@ -268,8 +275,8 @@ Optional local end-to-end run (outside Kestra):
    limit 20;
 
 3. Data quality guard (score symmetry):
-   - `dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql`
-   - `docs/score_difference_data_quality.md`
+   - [dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql](dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql)
+   - [docs/score_difference_data_quality.md](docs/score_difference_data_quality.md)
 
 ### Matplotlib Artifact Validation
 
@@ -278,50 +285,50 @@ Optional local end-to-end run (outside Kestra):
   make matplotlib-dashboard
 
 2. Confirm categorical chart exists:
-  - `docs/assets/matplotlib/league_margin_categorical_matplotlib.png`
+  - [docs/assets/matplotlib/league_margin_categorical_matplotlib.png](docs/assets/matplotlib/league_margin_categorical_matplotlib.png)
 
 3. Confirm league time-series charts exist:
-  - `docs/assets/matplotlib/league_score_difference_timeseries_european_rugby_challenge_cup.png`
-  - `docs/assets/matplotlib/league_score_difference_timeseries_european_rugby_champions_cup.png`
-  - `docs/assets/matplotlib/league_score_difference_timeseries_super_rugby_pacific.png`
+  - [docs/assets/matplotlib/league_score_difference_timeseries_european_rugby_challenge_cup.png](docs/assets/matplotlib/league_score_difference_timeseries_european_rugby_challenge_cup.png)
+  - [docs/assets/matplotlib/league_score_difference_timeseries_european_rugby_champions_cup.png](docs/assets/matplotlib/league_score_difference_timeseries_european_rugby_champions_cup.png)
+  - [docs/assets/matplotlib/league_score_difference_timeseries_super_rugby_pacific.png](docs/assets/matplotlib/league_score_difference_timeseries_super_rugby_pacific.png)
 
 4. Data quality guard (shared with Looker Studio):
-  - `dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql`
-  - `docs/score_difference_data_quality.md`
+  - [dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql](dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql)
+  - [docs/score_difference_data_quality.md](docs/score_difference_data_quality.md)
 
 ## Deliverables
 
-- Final report PDF: `docs/assets/looker-studio/Copy_of_rugby-datatalks-report.pdf`
+- Final report PDF: [docs/assets/looker-studio/Copy_of_rugby-datatalks-report.pdf](docs/assets/looker-studio/Copy_of_rugby-datatalks-report.pdf)
 - Report page screenshots:
-  - `docs/assets/looker-studio/report-page-1.png`
-  - `docs/assets/looker-studio/report-page-2.png`
+  - [docs/assets/looker-studio/report-page-1.png](docs/assets/looker-studio/report-page-1.png)
+  - [docs/assets/looker-studio/report-page-2.png](docs/assets/looker-studio/report-page-2.png)
 - Matplotlib dashboard chart artifacts:
-  - `docs/assets/matplotlib/league_margin_categorical_matplotlib.png`
-  - `docs/assets/matplotlib/league_score_difference_timeseries_european_rugby_challenge_cup.png`
-  - `docs/assets/matplotlib/league_score_difference_timeseries_european_rugby_champions_cup.png`
-  - `docs/assets/matplotlib/league_score_difference_timeseries_super_rugby_pacific.png`
-- Score-difference data quality remediation: `docs/score_difference_data_quality.md`
-- Project objective: `docs/de_zoomcamp_project_spec.md`
-- Historical project roadmap (planning snapshot): `docs/archive/rugby-stats-pipeline.md`
-- Looker Studio pipeline documentation: `docs/pipelines/looker-studio/README.md`
-- Matplotlib pipeline documentation: `docs/pipelines/matplotlib/README.md`
-- rugbypy source notes: `docs/rugbypy.md`
+  - [docs/assets/matplotlib/league_margin_categorical_matplotlib.png](docs/assets/matplotlib/league_margin_categorical_matplotlib.png)
+  - [docs/assets/matplotlib/league_score_difference_timeseries_european_rugby_challenge_cup.png](docs/assets/matplotlib/league_score_difference_timeseries_european_rugby_challenge_cup.png)
+  - [docs/assets/matplotlib/league_score_difference_timeseries_european_rugby_champions_cup.png](docs/assets/matplotlib/league_score_difference_timeseries_european_rugby_champions_cup.png)
+  - [docs/assets/matplotlib/league_score_difference_timeseries_super_rugby_pacific.png](docs/assets/matplotlib/league_score_difference_timeseries_super_rugby_pacific.png)
+- Score-difference data quality remediation: [docs/score_difference_data_quality.md](docs/score_difference_data_quality.md)
+- Project objective: [docs/de_zoomcamp_project_spec.md](docs/de_zoomcamp_project_spec.md)
+- Historical project roadmap (planning snapshot): [docs/archive/rugby-stats-pipeline.md](docs/archive/rugby-stats-pipeline.md)
+- Looker Studio pipeline documentation: [docs/pipelines/looker-studio/README.md](docs/pipelines/looker-studio/README.md)
+- Matplotlib pipeline documentation: [docs/pipelines/matplotlib/README.md](docs/pipelines/matplotlib/README.md)
+- rugbypy source notes: [docs/rugbypy.md](docs/rugbypy.md)
 
 ## DE Zoomcamp Rubric Mapping
 
 Use this section to quickly verify where each scoring criterion is evidenced.
 
 1. Problem description
-- Project objective and scope: `docs/de_zoomcamp_project_spec.md`
+- Project objective and scope: [docs/de_zoomcamp_project_spec.md](docs/de_zoomcamp_project_spec.md)
 - End-to-end goal and business intent: `README.md` sections Project Goal and Architecture Overview
 
 2. Cloud
 - Warehouse and analytics platform: BigQuery
-- Infrastructure as code: `infra/terraform/`
+- Infrastructure as code: [infra/terraform/](infra/terraform/)
 - Credentials and project configuration flow: Prerequisites + Configuration sections above
 
 3. Data ingestion (batch + orchestration)
-- Scheduled orchestration flow: `flows/rugby_pipeline_daily.yml`
+- Scheduled orchestration flow: [flows/rugby_pipeline_daily.yml](flows/rugby_pipeline_daily.yml)
 - End-to-end task chain: fetch -> raw files -> BigQuery load -> dbt
 - Local reproducible equivalent: `make pipeline-local`
 
@@ -333,15 +340,15 @@ Use this section to quickly verify where each scoring criterion is evidenced.
 - Rationale is documented in Notes section below
 
 5. Transformations
-- dbt project: `dbt/rugby_stats/`
+- dbt project: [dbt/rugby_stats/](dbt/rugby_stats/)
 - Build + tests entrypoint: `make dbt-build`
-- Custom data quality test example: `dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql`
+- Custom data quality test example: [dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql](dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql)
 
 6. Dashboard
 - Tile 1 (categorical): `vw_league_margin_categorical`
 - Tile 2 (temporal): `vw_league_score_difference_timeseries`
 - Validation queries and required fields: Dashboard Tile Validation section
-- Evidence artifacts: `docs/assets/looker-studio/` and `docs/assets/matplotlib/`
+- Evidence artifacts: [docs/assets/looker-studio/](docs/assets/looker-studio/) and [docs/assets/matplotlib/](docs/assets/matplotlib/)
 
 7. Reproducibility
 - Full runbook: Reproduction Steps section
