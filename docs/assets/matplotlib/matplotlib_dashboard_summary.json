@@ -1,12 +1,12 @@
 {
-  "timestamp_utc": "2026-04-20T03:14:27.223832Z",
+  "timestamp_utc": "2026-05-02T00:05:18.864752Z",
   "project_id": "rugby-datatalks-pipeline",
   "dataset": "raw",
-  "data_source": "local",
+  "data_source": "bigquery",
   "inputs": {
-    "categorical_view": null,
-    "timeseries_view": null,
-    "local_team_stats_dir": "data/raw/team_stats",
+    "categorical_view": "rugby-datatalks-pipeline.raw.vw_league_margin_categorical",
+    "timeseries_view": "rugby-datatalks-pipeline.raw.vw_league_score_difference_timeseries",
+    "local_team_stats_dir": null,
     "max_teams_per_league": null,
     "teams_selection": "all"
   },
@@ -20,7 +20,7 @@
   },
   "row_counts": {
     "categorical_rows": 3,
-    "timeseries_rows": 777
+    "timeseries_rows": 774
   },
   "teams_rendered_by_league": {
     "European Rugby Challenge Cup": [
@@ -70,13 +70,13 @@
       "Leinster",
       "Toulouse",
       "Munster",
-      "Leicester",
       "Bordeaux",
       "Harlequins",
       "Sale",
       "Northampton",
-      "Castres",
+      "Leicester",
       "Clermont",
+      "Castres",
       "Exeter Chiefs",
       "Glasgow",
       "Bristol",

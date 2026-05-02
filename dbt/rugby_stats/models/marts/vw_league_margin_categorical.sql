@@ -13,5 +13,7 @@ select
   approx_quantiles(abs(score_difference), 100)[offset(50)] as median_match_margin
 from {{ ref('fct_team_performance') }}
 where score_difference is not null
+  and lower(team_name) != 'other'
+  and lower(opponent_team_name) != 'other'
 group by 1
 having league_name is not null

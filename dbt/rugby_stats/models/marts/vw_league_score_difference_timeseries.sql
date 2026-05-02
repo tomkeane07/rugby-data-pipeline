@@ -53,3 +53,5 @@ select
   league_name
 from league_mapped
 where league_name is not null
+  and lower(team_name) != 'other'
+  and lower(opponent_team_name) != 'other'

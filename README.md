@@ -99,7 +99,10 @@ flowchart LR
 ## Prerequisites
 
 1. Docker and Docker Compose
-2. GCP service account key at `secrets/cloud_key.json`
+2. GCP service account key at `secrets/cloud_key.json` with required roles:
+   - BigQuery Data Editor
+   - BigQuery Job User
+   - Storage Admin
 3. Access to your target BigQuery project
 
 ## Configuration
@@ -176,8 +179,8 @@ Run from repository root.
 
 1. Clone and enter the repository:
 
-  git clone https://github.com/tomkeane/rugby_data_project.git
-  cd rugby_data_project
+  git clone https://github.com/tomkeane07/rugby-data-pipeline.git
+  cd rugby-data-pipeline
 
 2. Create local configuration files:
 
@@ -238,7 +241,16 @@ Optional local end-to-end run (outside Kestra):
 
 ### Looker Studio Tile Validation
 
-1. Tile 1 (categorical dPrecedenceistribution): `vw_league_margin_categorical`
+**To recreate the live dashboard**: 
+- Live report: [Looker Studio Report](https://datastudio.google.com/reporting/5ad118e2-45bb-4b7c-908c-6196c9b91ef7)
+- Report screenshots and PDF evidence: `docs/assets/looker-studio/`
+- To create a new Looker Studio report from scratch, use the same BigQuery datasource and BigQuery connector configuration. Chart tiles should connect to:
+  - Tile 1: `vw_league_margin_categorical`
+  - Tile 2: `vw_league_score_difference_timeseries`
+
+**Validation steps:**
+
+1. Tile 1 (categorical distribution): `vw_league_margin_categorical`
    - Expected fields: `league_name`, `avg_match_margin`, `median_match_margin`, `matches`
   - Quick check query (replace placeholders with your values):
 
@@ -394,3 +406,25 @@ Timeseries charts (one image per league):
 - Local raw extracts, secrets, dbt build outputs, and Terraform state are intentionally git-ignored.
 - Score-difference symmetry is protected by a custom dbt data test in `dbt/rugby_stats/tests/fct_team_performance_score_symmetry.sql`.
 - The `team_stats` BigQuery table is **partitioned by `game_date`** and **clustered by `team_id`**. Partitioning by date allows dashboard and dbt queries that filter on a season or date range to scan only the relevant partitions, reducing cost and latency. Clustering by `team_id` further optimises the most common access pattern: filtering or aggregating stats for a specific team.
+
+## Future Enhancements
+
+### Streaming Pipeline Extension
+
+The current implementation is **batch-only** (daily scheduled ingestion). For live match-day statistics and real-time dashboard updates, consider:
+
+- **Google Cloud Pub/Sub + Dataflow**: Stream match events and player performance stats from rugbypy API webhooks into Pub/Sub topics, process with Dataflow, and write micro-batches to BigQuery in near real-time.
+- **Apache Kafka Alternative**: Deploy Kafka on GKE or self-managed infrastructure if Pub/Sub integration is not preferred.
+- **BigQuery Streaming Inserts**: Ingest event-level data (e.g., try scores, territorial changes) as they occur, then use dbt incremental models to aggregate into fact tables.
+
+Benefits:
+- Live dashboard tiles updating every few seconds during matches.
+- Reduced ingestion latency from hours (daily) to minutes or seconds.
+- Ability to trigger alerts based on real-time performance thresholds.
+
+Reference architecture:
+```
+rugbypy webhook → Pub/Sub topic → Dataflow pipeline → BigQuery staging tables → dbt incremental models → Live Looker Studio tiles
+```
+
+This extension is optional per the DE Zoomcamp rubric (batch **or** streaming is sufficient), but would be a natural next step for expanding dashboard interactivity and enabling match-day analysis workflows.

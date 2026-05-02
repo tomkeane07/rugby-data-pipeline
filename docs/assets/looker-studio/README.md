@@ -2,6 +2,8 @@
 
 This folder contains Looker Studio report artifacts.
 
+**Live report**: https://datastudio.google.com/reporting/5ad118e2-45bb-4b7c-908c-6196c9b91ef7
+
 ## Preview
 
 ### Report Page 1
